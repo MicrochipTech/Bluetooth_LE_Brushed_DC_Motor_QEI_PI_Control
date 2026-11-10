@@ -1,0 +1,232 @@
+/*
+ * Copyright (c) 2025 Microchip Technology Inc.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+#include <microchip/pic32c/pic32cx_bz/bz6x/bz62/pic32cx2051bz62132.dtsi>
+#include "bz6_motor_control_board-pinctrl.dtsi"
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+#include <zephyr/dt-bindings/i2c/i2c.h>
+
+/ {
+	model = "Microchip BZ6 Motor Control Board";
+	compatible = "microchip,bz6-motor-control-board";
+
+	chosen {
+		zephyr,console = &sercom0;
+		zephyr,shell-uart = &sercom0;
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zephyr,code-partition = &code_partition;
+		zephyr,bt-hci = &bt_hci_microchip;
+		zephyr,bt-c2h-uart = &sercom0;
+		zephyr,ieee802154 = &ieee802154;
+		zephyr,cortex-m-idle-timer = &rtc;
+		zephyr,entropy = &trng;
+		zephyr,crypto = &crypto;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		led0: led_0 {
+			/* D801 blue LED: PE0 low = ON, PE0 high = OFF */
+			gpios = <&porte 0 GPIO_ACTIVE_LOW>;
+			label = "User LED";
+		};
+	};
+
+	buttons {
+		compatible = "gpio-keys";
+		button0: button_0 {
+			gpios = <&porte 3 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			label = "BTN0";
+			zephyr,code = <INPUT_KEY_0>;
+		};
+	};
+
+	aliases {
+		led0 = &led0;
+		sw0 = &button0;
+		rtc = &rtc;
+		watchdog0 = &wdog;
+	};
+};
+
+&cpu0 {
+	clock-frequency = <128000000>;
+};
+
+&sosc {
+	sosc-en = <0>;
+};
+
+&vbkpclk {
+	vbkpclk-32kc-src-sel = "lprc";
+};
+
+&lpclk {
+	lpclk-div-modifier = "div_by_1.024";
+};
+
+&rtcclk {
+	rtcclk-vbkp-div-sel = "div_by_32";
+};
+
+&sercom0 {
+	status = "okay";
+	compatible = "microchip,sercom-g1-uart";
+	rxpo = <1>;
+	txpo = <0>;
+	current-speed = <115200>;
+	pinctrl-0 = <&sercom0_uart_default>;
+	pinctrl-names = "default";
+
+	dmas = <&dmac 0 4>, <&dmac 1 5>;
+	dma-names = "rx", "tx";
+};
+
+&sercom1 {
+	status = "okay";
+	compatible = "microchip,sercom-g1-i2c";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-0 = <&sercom1_i2c_default>;
+	pinctrl-names = "default";
+
+	dmas = <&dmac 2 6>, <&dmac 3 7>;
+	dma-names = "rx", "tx";
+};
+
+&sercom4 {
+	status = "okay";
+	compatible = "microchip,sercom-g1-spi";
+	dipo = <0>;
+	dopo = <2>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	pinctrl-0 = <&sercom4_spi_master_socket1>;
+	pinctrl-names = "default";
+
+	dmas = <&dmac 4 12>, <&dmac 5 13>;
+	dma-names = "rx", "tx";
+};
+
+&sercom5 {
+	status = "okay";
+	compatible = "microchip,sercom-g1-uart";
+	rxpo = <3>;
+	txpo = <0>;
+	current-speed = <115200>;
+	pinctrl-0 = <&sercom5_uart_default>;
+	pinctrl-names = "default";
+
+	dmas = <&dmac 6 14>, <&dmac 7 15>;
+	dma-names = "rx", "tx";
+};
+
+&bt_hci_microchip {
+	status = "okay";
+};
+
+&ieee802154 {
+	status = "okay";
+};
+
+&trng {
+	status = "okay";
+};
+
+&crypto {
+	status = "okay";
+};
+
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		code_partition: partition@0 {
+			label = "code";
+			reg = <0x0 DT_SIZE_K(2048-16)>;
+			read-only;
+		};
+
+		storage_partition: partition@1FC000 {
+			label = "storage";
+			reg = <0x1FC000 0x00004000>;
+		};
+	};
+};
+
+&porta {
+	status = "okay";
+};
+
+&portb {
+	status = "okay";
+};
+
+&rtc {
+	compatible = "microchip,rtc-g1-counter";
+	status = "okay";
+	max-bit-width = <32>;
+	prescaler = <1>;
+};
+
+&tcc0 {
+	status = "disabled";
+	compatible = "microchip,tcc-g1-pwm";
+	#pwm-cells = <3>;
+	pinctrl-0 = <&tcc0_pwm_default>;
+	pinctrl-names = "default";
+	max-bit-width = <24>;
+	prescaler = <1>;
+	channels = <6>;
+};
+
+&tcc1 {
+	status = "disabled";
+	compatible = "microchip,tcc-g1-pwm";
+	#pwm-cells = <3>;
+	pinctrl-0 = <&tcc1_pwm_default>;
+	pinctrl-names = "default";
+	max-bit-width = <24>;
+	prescaler = <1>;
+	channels = <6>;
+};
+
+&tcc2 {
+	status = "disabled";
+	compatible = "microchip,tcc-g1-pwm";
+	#pwm-cells = <3>;
+	pinctrl-0 = <&tcc2_pwm_default>;
+	pinctrl-names = "default";
+	max-bit-width = <24>;
+	prescaler = <1>;
+	channels = <6>;
+};
+
+&tc0 {
+	status = "disabled";
+	compatible = "microchip,tc-g1";
+	#pwm-cells = <3>;
+	pinctrl-0 = <&tc0_pwm_default>;
+	pinctrl-names = "default";
+	max-bit-width = <32>;
+	prescaler = <1>;
+};
+
+&tc1 {
+	status = "disabled";
+	compatible = "microchip,tc-g1";
+	#pwm-cells = <3>;
+	pinctrl-0 = <&tc1_pwm_default>;
+	pinctrl-names = "default";
+	max-bit-width = <32>;
+	prescaler = <1>;
+};

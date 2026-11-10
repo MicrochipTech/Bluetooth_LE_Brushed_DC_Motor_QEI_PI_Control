@@ -1,0 +1,9 @@
+# Copyright (c) 2025 Microchip Technology Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+if BOARD_BZ6_MOTOR_CONTROL_BOARD
+
+config COUNTER
+	default y if PM
+
+endif

@@ -1,0 +1,83 @@
+/*
+ * MPPB brushed DC motor control for bz6_motor_control_board.
+ *
+ * This overlay file configures the motor control hardware interfaces
+ * for the BZ6 Motor Control Board. The board uses MPPB (Multi-Phase Power Board)
+ * Drive A/B configured as one H-bridge.
+ *
+ * Hardware Mapping:
+ *   A High: PA7 / TCC0 WO0 -> MPPB pin 26
+ *   A Low:  PA3 / GPIO    -> MPPB pin 25
+ *   B High: PA1 / TCC0 WO1 -> MPPB pin 24
+ *   B Low:  PA0 / GPIO    -> MPPB pin 23
+ *
+ * Encoder A/B: PC9 / pin 32 (Hall C), PC8 / pin 34 (Hall B).
+ * QEI routes PC8 to QEA and PC9 to QEB in plib_qei.c, without decoder swapping.
+ * Low sides use GPIO rather than the connector's alternate TCC functions.
+ * Drives C/D, PWM IN, monitor inputs and MPPB LED are not used here.
+ */
+
+/ {
+	/* GPIO-based DC motor control outputs for low-side drives */
+	mppb_outputs {
+		compatible = "gpio-leds";
+		status = "okay";
+
+		dc_motor_a_low: dc_motor_a_low {
+			gpios = <&porta 3 GPIO_ACTIVE_HIGH>;
+			label = "MPPB Drive A Low";
+		};
+
+		dc_motor_b_low: dc_motor_b_low {
+			gpios = <&porta 0 GPIO_ACTIVE_HIGH>;
+			label = "MPPB Drive B Low";
+		};
+	};
+
+	/* PWM-based DC motor control outputs for high-side drives */
+	mppb_pwm_outputs {
+		compatible = "pwm-leds";
+		status = "okay";
+
+		dc_motor_a_high_pwm: dc_motor_a_high_pwm {
+			status = "okay";
+			pwms = <&tcc0 0 PWM_USEC(1000) 0>;
+		};
+
+		dc_motor_b_high_pwm: dc_motor_b_high_pwm {
+			status = "okay";
+			pwms = <&tcc0 1 PWM_USEC(1000) 0>;
+		};
+	};
+
+	aliases {
+		led3 = &led0;
+		dc-motor-a-high-pwm = &dc_motor_a_high_pwm;
+		dc-motor-b-high-pwm = &dc_motor_b_high_pwm;
+		dc-motor-a-low = &dc_motor_a_low;
+		dc-motor-b-low = &dc_motor_b_low;
+	};
+};
+
+/* Pin controller configuration for TCC0 PWM outputs */
+&pinctrl {
+	tcc0_pwm_mppb: tcc0_pwm_mppb {
+		group1 {
+			pinmux = <PA7_TCC0WO0_OUT>,
+				<PA1_TCC0WO1_OUT>;
+		};
+	};
+};
+
+/* Timer/Counter Controller 0 configuration for PWM */
+&tcc0 {
+	status = "okay";
+	pinctrl-0 = <&tcc0_pwm_mppb>;
+	pinctrl-names = "default";
+	prescaler = <1>;
+};
+
+/* SERCOM5 shares PA0/PA1 with the motor outputs. */
+&sercom5 {
+	status = "disabled";
+};

@@ -1,0 +1,10 @@
+sample:
+  name: BLE Brushed DC Motor with MPPB
+  description: Control a brushed DC motor from PIC32WM BZ6204 Curiosity or BZ6 Motor Control Board through the Microchip Multi-Phase Power Board.
+  tags: bluetooth pwm gpio motor
+tests:
+  build:
+    platform_allow:
+      - pic32wm_bz6204_curiosity/pic32cx2051bz62132
+      - bz6_motor_control_board/pic32cx2051bz62132
+    tags: bluetooth pwm gpio motor

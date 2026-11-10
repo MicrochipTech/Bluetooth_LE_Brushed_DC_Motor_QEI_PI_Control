@@ -1,0 +1,9 @@
+# Copyright (c) 2025 Microchip Technology Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+board:
+  name: bz6_motor_control_board
+  full_name: BZ6 Motor Control Board
+  vendor: microchip
+  socs:
+    - name: pic32cx2051bz62132

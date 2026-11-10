@@ -1,0 +1,80 @@
+/*
+ * MPPB brushed DC motor control for pic32wm_bz6204_curiosity.
+ *
+ * MPPB Drive A/B are used as one H-bridge:
+ *   A High: RPA7 / TCC0 WO0 -> MPPB pin 26
+ *   A Low:  RPA3             -> MPPB pin 25
+ *   B High: RPA1 / TCC0 WO1 -> MPPB pin 24
+ *   B Low:  RPA0             -> MPPB pin 23
+ */
+
+/ {
+	leds {
+		compatible = "gpio-leds";
+		led3: led_3 {
+			gpios = <&portb 7 GPIO_ACTIVE_LOW>;
+			label = "User LED 1";
+		};
+	};
+
+	mppb_outputs {
+		compatible = "gpio-leds";
+		status = "okay";
+
+		dc_motor_a_low: dc_motor_a_low {
+			gpios = <&porta 3 GPIO_ACTIVE_HIGH>;
+			label = "MPPB Drive A Low";
+		};
+
+		dc_motor_b_low: dc_motor_b_low {
+			gpios = <&porta 0 GPIO_ACTIVE_HIGH>;
+			label = "MPPB Drive B Low";
+		};
+	};
+
+	mppb_pwm_outputs {
+		compatible = "pwm-leds";
+		status = "okay";
+
+		dc_motor_a_high_pwm: dc_motor_a_high_pwm {
+			status = "okay";
+			pwms = <&tcc0 0 PWM_NSEC(50000) 0>;
+		};
+
+		dc_motor_b_high_pwm: dc_motor_b_high_pwm {
+			status = "okay";
+			pwms = <&tcc0 1 PWM_NSEC(50000) 0>;
+		};
+	};
+
+	aliases {
+		led3 = &led3;
+		dc-motor-a-high-pwm = &dc_motor_a_high_pwm;
+		dc-motor-b-high-pwm = &dc_motor_b_high_pwm;
+		dc-motor-a-low = &dc_motor_a_low;
+		dc-motor-b-low = &dc_motor_b_low;
+	};
+};
+
+&pinctrl {
+	tcc0_pwm_mppb: tcc0_pwm_mppb {
+		group1 {
+			pinmux = <PA7_TCC0WO0_OUT>,
+				<PA1_TCC0WO1_OUT>;
+		};
+	};
+};
+
+&tcc0 {
+	status = "okay";
+	pinctrl-0 = <&tcc0_pwm_mppb>;
+	pinctrl-names = "default";
+	prescaler = <1>;
+};
+
+&sercom5 {
+	status = "disabled";
+};
+
+/* Enable timer/counter modules for PWM */
+

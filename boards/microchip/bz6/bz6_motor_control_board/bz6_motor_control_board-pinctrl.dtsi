@@ -1,0 +1,200 @@
+/*
+ * Copyright (c) 2025 Microchip Technology Inc.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <dt-bindings/pic32c/pic32cx_bz/bz62/pic32cx2051bz62132-pinctrl.h>
+
+&pinctrl {
+	sercom0_uart_default: sercom0_uart_default {
+		group1 {
+			pinmux = <PA5_SCOM0P0_OUT>,
+			<PA6_SCOM0P1_IN>;
+		};
+	};
+
+	sercom4_uart_default: sercom4_uart_default {
+		group1 {
+			pinmux = <PB2_SCOM4P0_OUT>,
+			<PA2_SCOM4P2_IN>;
+		};
+	};
+
+	sercom5_uart_default: sercom5_uart_default {
+		group1 {
+			pinmux = <PA0_SCOM5P0_OUT>,
+			<PA1_SCOM5P3_IN>;
+		};
+	};
+
+	sercom4_spi_master_socket1: sercom4_spi_master_socket1 {
+		group1 {
+			pinmux = <PA10_SCOM4P2_OUT>,
+			<PE5_SCOM4P1_OUT>,
+			<PA4_SCOM4P0_IN>,
+			<PA9_SCOM4P3_OUT>;
+		};
+	};
+	sercom4_spi_slave_socket1: sercom4_spi_slave_socket1 {
+		group1 {
+			pinmux = <PA10_SCOM4P2_IN>,
+			<PE5_SCOM4P1_IN>,
+			<PA4_SCOM4P0_OUT>,
+			<PA9_SCOM4P3_IN>;
+		};
+	};
+
+	sercom4_spi_master_socket2: sercom4_spi_master_socket2 {
+		group1 {
+			pinmux = <PB9_SCOM4P2_OUT>,
+			<PE5_SCOM4P1_OUT>,
+			<PA4_SCOM4P0_IN>,
+			<PA9_SCOM4P3_OUT>;
+		};
+	};
+
+	sercom1_i2c_default: sercom1_i2c_default {
+		group1 {
+			pinmux = <PIN_DIRECT_MODE>;
+		};
+	};
+
+	tcc0_pwm_default: tcc0_pwm_default {
+		group1 {
+			pinmux = <PC7_TCC0WO1_OUT>;
+		};
+	};
+
+	tcc1_pwm_default: tcc1_pwm_default {
+		group1 {
+			pinmux = <PC10_TCC1WO1_OUT>;
+		};
+	};
+
+	tcc2_pwm_default: tcc2_pwm_default {
+		group1 {
+			pinmux = <PB7_TCC2WO1_OUT>;
+		};
+	};
+
+	tc0_pwm_default: tc0_pwm_default {
+		group1 {
+			pinmux = <PC7_TC0WO1_OUT>;
+		};
+	};
+
+	tc0_pwm_8bit: tc0_pwm_8bit {
+		group1 {
+			pinmux = <PE0_TC0WO0_OUT>;
+		};
+	};
+
+	tc1_pwm_default: tc1_pwm_default {
+		group1 {
+			pinmux = <PC7_TC1WO1_OUT>;
+		};
+	};
+
+	tc1_pwm_8bit: tc1_pwm_8bit {
+		group1 {
+			pinmux = <PE0_TC1WO0_OUT>;
+		};
+	};
+
+	tc2_pwm_default: tc2_pwm_default {
+		group1 {
+			pinmux = <PC7_TC2WO1_OUT>;
+		};
+	};
+
+	tc2_pwm_8bit: tc2_pwm_8bit {
+		group1 {
+			pinmux = <PE0_TC2WO0_OUT>;
+		};
+	};
+
+	tc3_pwm_default: tc3_pwm_default {
+		group1 {
+			pinmux = <PC7_TC3WO1_OUT>;
+		};
+	};
+
+	tc3_pwm_8bit: tc3_pwm_8bit {
+		group1 {
+			pinmux = <PE0_TC3WO0_OUT>;
+		};
+	};
+
+	tc4_pwm_default: tc4_pwm_default {
+		group1 {
+			pinmux = <PC7_TC4WO1_OUT>;
+		};
+	};
+
+	tc4_pwm_8bit: tc4_pwm_8bit {
+		group1 {
+			pinmux = <PE0_TC4WO0_OUT>;
+		};
+	};
+
+	tc5_pwm_default: tc5_pwm_default {
+		group1 {
+			pinmux = <PC7_TC5WO1_OUT>;
+		};
+	};
+
+	tc5_pwm_8bit: tc5_pwm_8bit {
+		group1 {
+			pinmux = <PE0_TC5WO0_OUT>;
+		};
+	};
+
+	tc6_pwm_default: tc6_pwm_default {
+		group1 {
+			pinmux = <PC7_TC6WO1_OUT>;
+		};
+	};
+
+	tc6_pwm_8bit: tc6_pwm_8bit {
+		group1 {
+			pinmux = <PE0_TC6WO0_OUT>;
+		};
+	};
+
+	tc7_pwm_default: tc7_pwm_default {
+		group1 {
+			pinmux = <PC7_TC7WO1_OUT>;
+		};
+	};
+
+	tc7_pwm_8bit: tc7_pwm_8bit {
+		group1 {
+			pinmux = <PE0_TC7WO0_OUT>;
+		};
+	};
+
+	tc8_pwm_default: tc8_pwm_default {
+		group1 {
+			pinmux = <PC7_TC8WO1_OUT>;
+		};
+	};
+
+	tc8_pwm_8bit: tc8_pwm_8bit {
+		group1 {
+			pinmux = <PE0_TC8WO0_OUT>;
+		};
+	};
+
+	tc9_pwm_default: tc9_pwm_default {
+		group1 {
+			pinmux = <PC10_TC9WO1_OUT>;
+		};
+	};
+
+	tc9_pwm_8bit: tc9_pwm_8bit {
+		group1 {
+			pinmux = <PB7_TC9WO0_OUT>;
+		};
+	};
+};
