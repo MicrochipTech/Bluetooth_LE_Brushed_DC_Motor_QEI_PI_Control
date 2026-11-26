@@ -66,11 +66,26 @@ stopped while checking wiring, encoder phase and direction.
 | USB cable and supported debugger | 1 | Debug probe and OpenOCD requirements depend on the board setup |
 | Jumper wires | As needed | Curiosity uses jumpers for MPPB connections; MCB connects directly |
 
+#### Requesting a BZ6 Motor Control Board
+
+The BZ6 Motor Control Board is available by request rather than through the
+Microchip product-page ordering flow. Complete the
+[Motor Control Board request form](https://mkpage.microchip.com/get-your-development-board).
+Submitted requests are sent to Microchip's CSS team for follow-up.
+
 ### Wiring
 
 Connect the MPPB control header, motor, encoder and power supply with power
 removed. **The motor power supply connects to the MPPB power input—not directly
 to the motor.**
+
+**PIC32-BZ6 Curiosity with MPPB**
+
+<p align="center"><img src="docs/curiosity-mppb-hardware.jpeg" alt="PIC32-BZ6 Curiosity connected to the MPPB, brushed DC motor and MBD app" width="100%"></p>
+
+**BZ6 Motor Control Board with MPPB**
+
+<p align="center"><img src="docs/mcb-mppb-hardware.jpeg" alt="BZ6 Motor Control Board connected to the MPPB, brushed DC motor and MBD app" width="100%"></p>
 
 | Function | MPPB connection | PIC32-BZ6 Curiosity | BZ6 Motor Control Board |
 | :-- | :-- | :-- | :-- |
@@ -164,7 +179,8 @@ checkout does not provide all required Microchip components.
 
 #### Clone into the workspace
 
-From your Zephyr workspace's `applications` directory:
+For the Workbench workflow, clone from your Zephyr workspace's `applications`
+directory:
 
 ```powershell
 git clone https://github.com/MicrochipTech/Bluetooth_LE_Brushed_DC_Motor_QEI_PI_Control.git
@@ -187,13 +203,27 @@ workspace opened at the Zephyr workspace root:
 ```
 
 If VS Code opens the application directory itself, use
-`"${workspaceFolder}"`. Keep other board-root entries. Reload the VS Code
+`"${workspaceFolder}"`. Keep other board-root entries only if they define
+different boards. Do not register both this repository and another copy of
+`bz6_motor_control_board` (for example, the original development application):
+Zephyr rejects duplicate board definitions. Reload the VS Code
 window, choose **Change Board**, and select either supported board identifier.
 
 #### CLI
 
-Use the CLI from the Zephyr workspace root, where the `applications` directory
-is located. See the [Zephyr Wireless CLI workflow](https://github.com/Zephyr4Microchip/zephyr-wireless#legacy-command-line)
+No IDE import is required. For this CLI workflow, copy the application folder or
+clone the repository inside the Zephyr checkout's `samples` directory. The build
+commands below assume it is at
+`~/zephyrproject/zephyr/samples/Bluetooth_LE_Brushed_DC_Motor_QEI_PI_Control`.
+
+To clone it directly into that location:
+
+```bash
+cd ~/zephyrproject/zephyr/samples
+git clone https://github.com/MicrochipTech/Bluetooth_LE_Brushed_DC_Motor_QEI_PI_Control.git
+```
+
+See the [Zephyr Wireless CLI workflow](https://github.com/Zephyr4Microchip/zephyr-wireless#legacy-command-line)
 for workspace and shell setup.
 
 ### 3.3 Application configuration
@@ -227,17 +257,30 @@ devicetree and Kconfig settings are regenerated.
 
 #### CLI
 
-From the Zephyr workspace root:
+Refer to [Zephyr Wireless — Building sample applications](https://github.com/Zephyr4Microchip/zephyr-wireless#3-building-sample-applications).
+As in the servo application, run the build from the Zephyr checkout directory,
+using the application under `samples`.
 
-```powershell
-west build -p always -b pic32wm_bz6204_curiosity applications/Bluetooth_LE_Brushed_DC_Motor_QEI_PI_Control -d build/dc_motor_curiosity
-west build -p always -b bz6_motor_control_board applications/Bluetooth_LE_Brushed_DC_Motor_QEI_PI_Control -d build/dc_motor_mcb
+For Curiosity:
+
+```bash
+cd ~/zephyrproject/zephyr
+west build -p always -b pic32wm_bz6204_curiosity samples/Bluetooth_LE_Brushed_DC_Motor_QEI_PI_Control
+```
+
+Or, for the Motor Control Board:
+
+```bash
+cd ~/zephyrproject/zephyr
+west build -p always -b bz6_motor_control_board samples/Bluetooth_LE_Brushed_DC_Motor_QEI_PI_Control
 ```
 
 Zephyr automatically selects the matching
 `boards/pic32wm_bz6204_curiosity.overlay` or
-`boards/bz6_motor_control_board.overlay`. Each board can use a separate build
-directory, as above.
+`boards/bz6_motor_control_board.overlay`. Run only the command for your board.
+The output is generated under `~/zephyrproject/zephyr/build/`; `-p always`
+regenerates that build directory when changing boards. No precompiled image
+is required from this repository.
 
 ### 3.5 Program the board
 
@@ -248,15 +291,15 @@ supported by the board and make sure it is in programmer/debugger mode.
 
 #### CLI
 
-From the Zephyr workspace root, flash the build directory for the connected
-board:
+From the Zephyr checkout directory, flash the build produced in the previous
+section:
 
-```powershell
-west flash --runner openocd -d build/dc_motor_curiosity
-west flash --runner openocd -d build/dc_motor_mcb
+```bash
+cd ~/zephyrproject/zephyr
+west flash
 ```
 
-Only run the command matching the selected board. A message such as
+Connect the board matching the last build. A message such as
 `unable to find a matching CMSIS-DAP device` means OpenOCD cannot see the
 debug probe; check USB, probe selection/mode, drivers and any application
 holding the probe. It does not indicate a firmware build or QEI error.
@@ -404,6 +447,31 @@ The Bluetooth Control Point vendor frame uses hexadecimal bytes:
 `LENGTH` is the number of bytes following the length field. Slider RPM is an
 unsigned 16-bit big-endian value.
 
+#### UI update response (`B1`)
+
+```text
+8E | LENGTH | B1 | NAME_LENGTH | NAME | FEEDBACK_LENGTH | FEEDBACK |
+VOLTAGE_H L | MIN_RPM_H L | MAX_RPM_H L | SLIDER_H L | DIRECTION | START_STOP
+```
+
+Voltage, minimum RPM, maximum RPM and slider value are unsigned 16-bit
+big-endian fields. Minimum RPM is configured by `DC_MOTOR_MIN_RPM` in
+[`src/app_dc_motor.h`](src/app_dc_motor.h), currently **30 RPM** (`00 1E`).
+The existing 0–1360 RPM command range is unchanged (zero stops the motor). This is not a
+claim that every nonzero target is mechanically achievable.
+
+After reset, the full response is:
+
+```text
+8E 1A B1 0A 42 52 55 53 48 45 44 20 44 43 03 51 45 49 00 18 00 1E 05 50 05 50 01 00
+```
+
+This reports `BRUSHED DC`, `QEI`, 24 V, minimum 30 RPM, maximum 1360 RPM,
+slider 1360 RPM, CCW and STOP. `LENGTH` is **0x1A (26)** bytes after the
+length field; the full frame is 28 bytes. Adding minimum RPM changes the
+previous length of 0x18. For example, 50 RPM is encoded as `00 32`; the
+minimum field is metadata, not a new low-speed clamp.
+
 | Phone request | Example | ACK | Main response |
 | :-- | :-- | :-- | :-- |
 | Read UI/state | `8E 01 A1` | `8E 01 D1` | UI response `B1` |
@@ -456,6 +524,11 @@ elapsed time. Confirm encoder A/B routing and CW/CCW sign before enabling a
 powered closed-loop test.
 
 ## 5. Demo Setup and Operation
+
+The demo below shows wireless brushed-DC motor control using the MBD app,
+the BZ6 Motor Control Board and MPPB.
+
+https://github.com/user-attachments/assets/da585c05-47aa-4363-b3d4-f5811bb2753b
 
 1. Check all MPPB, encoder and motor connections against the table. Leave motor
    power off until the encoder direction has been checked.

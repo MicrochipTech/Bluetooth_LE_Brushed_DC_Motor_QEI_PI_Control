@@ -660,6 +660,9 @@ int app_dc_motor_ble_send_ui_update_response(struct bt_conn *conn)
     payload[payload_len++] = (DC_MOTOR_VOLTAGE >> 8) & 0xFF;
     payload[payload_len++] = DC_MOTOR_VOLTAGE & 0xFF;
 
+    payload[payload_len++] = (DC_MOTOR_MIN_RPM >> 8) & 0xFF;
+    payload[payload_len++] = DC_MOTOR_MIN_RPM & 0xFF;
+
     payload[payload_len++] = (DC_MOTOR_MAX_RPM >> 8) & 0xFF;
     payload[payload_len++] = DC_MOTOR_MAX_RPM & 0xFF;
 

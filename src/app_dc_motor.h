@@ -16,6 +16,7 @@
 
 /* UI Update Response fixed motor parameters */
 #define DC_MOTOR_VOLTAGE                24U
+#define DC_MOTOR_MIN_RPM                30U
 #define DC_MOTOR_MAX_RPM                1360U
 #define QEI_COUNTS_PER_OUTPUT_REV       194U
 #define DC_MOTOR_CLOSED_LOOP_ENABLED    1U
